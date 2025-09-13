@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive SVG Rulers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .ruler-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .highlight {
+            fill: #ff6b6b !important;
+            stroke: #ff4757 !important;
+        }
+        .measurement-text {
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Interactive Energy Equivalents</h1>
+    <p>Hover over the rulers to see the energy equivalents!</p>
+
+    <div class "ruler-container">
+      <h3>Frequency (Hz)</h3>
+      <svg viewBox="-30 -20 900 60" width="900" height="60" id="freq-ruler">
+	<!-- Background -->
+	<rect x="-30" y="-20" width="900" height="90" fill="#eaeaea" stroke="#bbb" stroke-width="0"/>
+
+	<rect class="bar-region" x="-10" y="0" width="900" height="20"
+	      fill="#a0a0a0" fill-opacity="0.3" stroke="black" stroke-width="0" />
+	<line x1="-10" y1="0" x2="900" y2="0" stroke="black" stroke-width="2" />
+	<line x1="-10" y1="20" x2="900" y2="20" stroke="black" stroke-width="2" />
+
+	<!-- Hover indicator -->
+        <!-- Major tick marks and numbers -->
+        <g id="f-ticks"></g>
+	
+	<!-- Indicator -->
+	<g id="f-indicator" transform="translate(400,0)">
+	  <line id="cursor" x1="0" y1="1" x2="0" y2="19"
+		stroke="red" stroke-opacity="1.0" stroke-width="1"/>
+	  <text class="current-value" x="-11" y="-5" fill="blue"> </text>
+	</g>
+      </svg>
+    </div>
+
+    <div class "ruler-container">
+      <h3>Temperature (K)</h3>
+      <svg viewBox="-30 -20 900 60" width="900" height="60" id="temperature-ruler">
+	<!-- Background -->
+	<rect x="-30" y="-20" width="900" height="90" fill="#eaeaea" stroke="#bbb" stroke-width="0"/>
+
+	<rect class="bar-region" x="-10" y="0" width="900" height="20" fill="#a0a0a0"
+	      fill-opacity="0.3" stroke="black" stroke-width="0" />
+	<line x1="-10" y1="0" x2="900" y2="0" stroke="black" stroke-width="2" />
+	<line x1="-10" y1="20" x2="900" y2="20" stroke="black" stroke-width="2" />
+	<!-- Indicator -->
+	<!-- <line id="T-indicator" x1="5" y1="1" x2="5" y2="19" stroke="red" stroke-opacity="1.0" stroke-width="1"/> -->
+
+	<!-- Hover indicator -->
+        <!-- Major tick marks and numbers -->
+        <g id="T-ticks"></g>
+	
+	<!-- Indicator -->
+	<g id="T-indicator" transform="translate(400,0)">
+	  <line id="cursor" x1="0" y1="1" x2="0" y2="19"
+		stroke="red" stroke-opacity="1.0" stroke-width="1"/>
+	  <text class="current-value" x="-11" y="-5" fill="blue"> </text>
+	</g>
+
+      </svg>
+    </div>
+
+    <div class "ruler-container">
+      <h3>Energy (eV)</h3>
+      <svg viewBox="-30 -20 900 60" width="900" height="60" id="eV-ruler">
+	<!-- Background -->
+	<rect x="-30" y="-20" width="900" height="90" fill="#eaeaea" stroke="#bbb" stroke-width="0"/>
+
+	<rect class="bar-region" x="-10" y="0" width="900" height="20" fill="#a0a0a0"
+	      fill-opacity="0.3" stroke="black" stroke-width="0" />
+	<line x1="-10" y1="0" x2="900" y2="0" stroke="black" stroke-width="2" />
+	<line x1="-10" y1="20" x2="900" y2="20" stroke="black" stroke-width="2" />
+	<!-- Indicator -->
+	<!-- <line id="eV-indicator" x1="5" y1="1" x2="5" y2="19" stroke="red" stroke-opacity="0.9" stroke-width="1"/> -->
+
+	<!-- Hover indicator -->
+        <!-- Major tick marks and numbers -->
+        <g id="eV-ticks"></g>
+
+	<g id="eV-indicator" transform="translate(400,0)">
+	  <line id="cursor" x1="0" y1="1" x2="0" y2="19"
+		stroke="red" stroke-opacity="1.0" stroke-width="1"/>
+	  <text class="current-value" x="-11" y="-5" fill="blue"> </text>
+	</g>
+	
+      </svg>
+    </div>
+
+
+    <script>
+	// Initialize rulers
+        
+        
+        // Add interactivity
+
+        
+
+      function initializeConfig() {
+	  globalThis.appConfig = { energy_in_J: 0.0,
+				   major_step: 100,
+				   Hz_start: 7,
+				   K_start: -3,
+				   eV_start: -7,
+				   J2Hz: 0.178744+33,
+				   J2K: -0.140083+23,
+				   J2eV: -0.204710+19,
+				 };
+      }
+
+
+      // function updateAllRuler(f, T, eV) {
+      // 	  const f_idctr = document.getElementById('f-indicator');
+      // 	  const T_idctr = document.getElementById('T-indicator');
+      // 	  const eV_idctr = document.getElementById('eV-indicator');
+	  
+      // 	  f_idctr.setAttribute('x1', f);
+      // 	  f_idctr.setAttribute('x2', f);
+      // 	  T_idctr.setAttribute('x1', T);
+      // 	  T_idctr.setAttribute('x2', T);
+      // 	  eV_idctr.setAttribute('x1', eV);
+      // 	  eV_idctr.setAttribute('x2', eV);
+      // }
+
+      function shift2Hz(E_in_J) {
+	  return (E_in_J + globalThis.appConfig.J2Hz - ruler.start) * globalThis.appConfig.major_step;
+      }
+
+      function updateFreqRuler(E_in_J) {
+	  const f_idctr = document.getElementById('f-indicator');
+	  const ruler = f_idctr.parentElement;
+	  const value_text = f_idctr.querySelector('.current-value');
+	  const start = Number(ruler.getAttribute('data-start'));
+	  const E_in_Hz = E_in_J + globalThis.appConfig.J2Hz;
+	  const x = (E_in_Hz - start) * globalThis.appConfig.major_step;
+	  console.log('x:', x);
+
+	  value_text.textContent = (10**E_in_Hz).toPrecision(2);
+	  // f_idctr.setAttribute('x2', x);
+	  f_idctr.setAttribute('transform', `translate(${x},0)`);
+      }
+      function updateTempRuler(E_in_J) {
+	  const T_idctr = document.getElementById('T-indicator');
+	  const ruler = T_idctr.parentElement;
+	  const start = Number(ruler.getAttribute('data-start'));
+	  const x = (E_in_J + globalThis.appConfig.J2K - start) * globalThis.appConfig.major_step;
+	  console.log('x:', x);
+
+	  T_idctr.setAttribute('x1', x);
+	  T_idctr.setAttribute('x2', x);
+      }
+      function updateEq() {
+	  const mId = document.getElementById('TtoHz');
+	  mId.textContent = "1.2345";
+      }
+      function updateIndicator(idctr_name, E_in_J) {
+	  const idctr = document.getElementById(idctr_name);
+	  const ruler = idctr.parentElement;
+	  const value_text = idctr.querySelector('.current-value');
+	  const start = Number(ruler.getAttribute('data-start'));
+	  const shift2J = Number(ruler.getAttribute('data-shift2J'));
+	  const x = (E_in_J - shift2J - start) * globalThis.appConfig.major_step;
+	  console.log('x:', x);
+
+	  value_text.textContent = (10**(E_in_J-shift2J)).toPrecision(3);
+	  // idctr.setAttribute('x1', x);
+	  // idctr.setAttribute('x2', x);
+	  idctr.setAttribute('transform', `translate(${x},0)`);
+	  
+      }
+
+      function setRulerAction(ruler_name, shift2J_log) {
+          const ruler = document.getElementById(ruler_name);
+	  ruler.setAttribute('data-shift2J', shift2J_log);
+	  const bar = ruler.querySelector('.bar-region');
+
+	  const start = Number(ruler.getAttribute('data-start'));
+	  bar.addEventListener('mousemove', function(e) {
+	      const pt = ruler.createSVGPoint();
+	      pt.x = e.clientX;
+	      pt.y = e.clientY;
+	      
+	      const ctm = ruler.getScreenCTM();
+	      const transformedPoint = pt.matrixTransform(ctm.inverse());
+	      const x = transformedPoint.x;
+	      const E_in_J = (x/globalThis.appConfig.major_step + start) + shift2J_log ;
+	      // updateAllRuler(0, x, x);
+	      // updateFreqRuler(E_in_J);
+	      updateIndicator('f-indicator', E_in_J);
+	      // updateTempRuler(E_in_J);
+	      updateIndicator('T-indicator', E_in_J);
+	      updateIndicator('eV-indicator', E_in_J);
+	      
+	      console.log('Mouse position in SVG:', transformedPoint.x, transformedPoint.y);
+	  });
+      }
+	
+      function createTicks(tick_name, start, end) {
+	  const Ticks = document.getElementById(tick_name);
+	  const ruler = Ticks.parentElement;
+	  ruler.setAttribute('data-start', start);
+
+	  for (let i=start; i <= end; i++) {
+	      const x = (i-start) * globalThis.appConfig.major_step;
+	      // Major tick
+	      const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+	      tick.setAttribute('x1', x);
+	      tick.setAttribute('y1', 2);
+	      tick.setAttribute('x2', x);
+	      tick.setAttribute('y2', 18);
+	      tick.setAttribute('stroke', 'white');
+	      tick.setAttribute('stroke-width', '0.5');
+	      Ticks.appendChild(tick);
+	      
+	      // Number label
+	      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+	      text.setAttribute('x', x);
+	      text.setAttribute('y', 35);
+	      text.setAttribute('text-anchor', 'middle');
+	      text.setAttribute('font-size', '12');
+	      text.setAttribute('fill', '#333');
+	      text.textContent = '1e' + i.toString();
+	      Ticks.appendChild(text);
+	      
+	      for (let j = 1; j < 10; j++) {
+		  const minorX = x + Math.log10(j)*globalThis.appConfig.major_step;
+		  const minorTick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+		  minorTick.setAttribute('x1', minorX);
+		  minorTick.setAttribute('y1', 0);
+		  minorTick.setAttribute('x2', minorX);
+		  minorTick.setAttribute('y2', 4);
+		  minorTick.setAttribute('stroke', 'black');
+		  minorTick.setAttribute('stroke-width', '1');
+		  minorTick.setAttribute('stroke-opacity', '0.2');
+		  const minorTickBottom = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+		  minorTickBottom.setAttribute('x1', minorX);
+		  minorTickBottom.setAttribute('y1', 14);
+		  minorTickBottom.setAttribute('x2', minorX);
+		  minorTickBottom.setAttribute('y2', 19);
+		  minorTickBottom.setAttribute('stroke', 'black');
+		  minorTickBottom.setAttribute('stroke-width', '1');
+		  minorTickBottom.setAttribute('stroke-opacity', '0.5');
+		  // Ticks.appendChild(minorTick);
+		  Ticks.appendChild(minorTickBottom);
+	      }
+	  }
+      }
+	// Initialize everything
+      initializeConfig();
+        // createHorizontalRuler();
+        // createVerticalRuler();
+        // setupHorizontalRuler();
+        // setupVerticalRuler();
+      createTicks('f-ticks', globalThis.appConfig.Hz_start, 17);
+      createTicks('T-ticks', globalThis.appConfig.K_start, 7);
+      createTicks('eV-ticks', globalThis.appConfig.eV_start, 3);
+      // updateAllRuler(0);
+      setRulerAction("freq-ruler", -globalThis.appConfig.J2Hz);
+      setRulerAction("temperature-ruler", -globalThis.appConfig.J2K);
+      setRulerAction("eV-ruler", -globalThis.appConfig.J2eV);
+      updateEq();
+    </script>
+</body>
+<footer style="text-align: center;">
+  <p>&copy; 2025 Wei-Ting Lin. Licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.</p>
+</footer>
+</html>
